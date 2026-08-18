@@ -66,9 +66,7 @@ def main() -> int:
     prefix = str(cfg.get("filename_prefix") or "scan")
     if dest.suffix:
         if crops:
-            paths = save_scan_set(
-                result.image, crops, dest.parent, stamp=dest.stem, prefix=prefix
-            )
+            paths = save_scan_set(result.image, crops, dest.parent, stamp=dest.stem, prefix=prefix)
         else:
             paths = [save_image(result.image, dest)]
     else:
@@ -88,4 +86,4 @@ if __name__ == "__main__":
     except (OSError, ScannerError) as e:
         cfg = load_config()
         print(get_i18n(cfg.get("language", "auto")).t("err_scanner", error=e), file=sys.stderr)
-        raise SystemExit(1)
+        raise SystemExit(1) from e

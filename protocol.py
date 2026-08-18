@@ -7,7 +7,6 @@ import socket
 import time
 from dataclasses import dataclass
 from io import BytesIO
-from typing import Optional
 
 from PIL import Image
 
@@ -33,7 +32,7 @@ class Offer:
     raw: str
 
     @classmethod
-    def parse(cls, text: str) -> "Offer":
+    def parse(cls, text: str) -> Offer:
         parts = text.split(",")
         if len(parts) < 7:
             raise ScannerError(f"bad offer: {text!r}")
@@ -130,14 +129,14 @@ def collect(
     while time.time() < deadline:
         try:
             chunk = sock.recv(65536)
-        except socket.timeout:
+        except TimeoutError:
             if _complete(out):
                 break
             if out:
                 raise ScannerError(
                     f"scan truncated after {len(out)} B (idle {idle_timeout:.0f}s)"
-                )
-            raise ScannerError("no data from scanner (timeout)")
+                ) from None
+            raise ScannerError("no data from scanner (timeout)") from None
         if not chunk:
             break
         out.extend(chunk)
@@ -147,7 +146,7 @@ def collect(
                 extra = sock.recv(8192)
                 if extra:
                     out.extend(extra)
-            except socket.timeout:
+            except TimeoutError:
                 pass
             break
         sock.settimeout(idle_timeout)
@@ -246,7 +245,7 @@ def scan(
     return ScanResult(kind=kind, offer=offer, image=image, raw_bytes=len(raw))
 
 
-def save_image(image: Image.Image, dest, fmt: Optional[str] = None):
+def save_image(image: Image.Image, dest, fmt: str | None = None):
     from pathlib import Path
 
     dest = Path(dest)

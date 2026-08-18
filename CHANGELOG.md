@@ -9,6 +9,7 @@ All notable changes to this project are documented here.
 - `config.yaml` + `config.example.yaml` and documented load order
 - User settings in `./settings.json` or `~/.config/j315scan/settings.json`
 - Packaging files for a public GitHub repo (LICENSE, CONTRIBUTING, CI, issue templates)
+- GitHub Actions: lint (Ruff), test on Python 3.10–3.13, sdist/wheel build, tag release
 
 ### Changed
 - Default save folder is `~/Pictures` (no nested subfolder)
