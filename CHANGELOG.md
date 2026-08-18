@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+### Fixed
+- Offline scanner no longer crashes the GUI (Python 3.14 except-variable lambdas + shadowed `Tk._root`)
+
 ## [0.2.0] — 2026-08-18
 
 ### Added

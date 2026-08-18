@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from config import load_config, save_user_settings
 from extract import extract_objects, save_scan_set, stamp_now
 from i18n import SUPPORTED, get_i18n
-from protocol import DPI_CHOICES, ScannerError, probe, save_image, scan
+from protocol import DPI_CHOICES, probe, save_image, scan
 
 
 class ScannerApp(tk.Tk):
