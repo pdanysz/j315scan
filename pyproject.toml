@@ -1,14 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "j315scan"
 version = "0.2.0"
 description = "Unofficial Brother DCP-J315W network scanner (TCP 54921)"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "j315scan contributors" }]
 keywords = ["brother", "scanner", "dcp-j315w", "sane", "brscan"]
 classifiers = [
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Topic :: Multimedia :: Graphics :: Capture :: Scanners",
 ]
@@ -18,11 +22,37 @@ dependencies = [
   "opencv-python-headless>=4.8",
 ]
 
+[project.optional-dependencies]
+dev = [
+  "ruff>=0.6",
+  "build>=1.2",
+]
+
 [project.scripts]
 j315scan = "cli:main"
 
 [project.urls]
-Changelog = "CHANGELOG.md"
+Changelog = "https://github.com/pdanysz/j315scan/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
 py-modules = ["app", "cli", "protocol", "extract", "config", "i18n"]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["locales"]
+
+[tool.setuptools.package-data]
+locales = ["*.json"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = [".", "tests"]
+extend-exclude = [".venv", "dist", "build"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["I001"]

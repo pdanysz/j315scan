@@ -88,8 +88,28 @@ Printing (Brother HBP on :9100) is out of scope.
 ## Tests
 
 ```bash
+.venv/bin/pip install -r requirements-dev.txt
+.venv/bin/ruff check .
+.venv/bin/ruff format --check .
 .venv/bin/python -m unittest discover -s tests -q
+.venv/bin/python -m build
 ```
+
+CI (`.github/workflows/ci.yml`) runs lint, tests on Python 3.10–3.13, and publishes sdist/wheel artifacts.
+
+## Release
+
+1. Bump `version` in `pyproject.toml` and add a `## [x.y.z]` section in `CHANGELOG.md`.
+2. Commit, then:
+
+```bash
+git tag v0.2.0
+git push origin main --tags
+```
+
+`.github/workflows/release.yml` builds, re-runs tests, and creates a GitHub Release with notes from the changelog plus `dist/*.whl` / `dist/*.tar.gz`.
+
+Manual: Actions → Release → Run workflow.
 
 ## License
 

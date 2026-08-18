@@ -78,7 +78,6 @@ class ScannerApp(tk.Tk):
         root.pack(fill=tk.BOTH, expand=True)
         root.columnconfigure(1, weight=1)
         root.rowconfigure(0, weight=1)
-        self._root = root
 
         side = ttk.Frame(root, padding=(0, 0, 12, 0))
         side.grid(row=0, column=0, sticky="nsw")
@@ -106,7 +105,9 @@ class ScannerApp(tk.Tk):
         self._widgets["ip"] = ttk.Label(box, text=self.t("ip"))
         self._widgets["ip"].grid(row=0, column=0, sticky="w")
         ttk.Entry(box, textvariable=self.host, width=16).grid(row=0, column=1, padx=6)
-        self._widgets["check"] = ttk.Button(box, text=self.t("check"), command=self.check_connection)
+        self._widgets["check"] = ttk.Button(
+            box, text=self.t("check"), command=self.check_connection
+        )
         self._widgets["check"].grid(row=0, column=2)
 
         opts = ttk.LabelFrame(side, text=self.t("scan_box"), padding=8)
@@ -139,17 +140,19 @@ class ScannerApp(tk.Tk):
         ttk.Scale(opts, from_=0, to=100, variable=self.contrast, orient=tk.HORIZONTAL).grid(
             row=3, column=1, sticky="ew", pady=2
         )
-        self._widgets["split"] = ttk.Checkbutton(
-            opts, text=self.t("split"), variable=self.split
-        )
+        self._widgets["split"] = ttk.Checkbutton(opts, text=self.t("split"), variable=self.split)
         self._widgets["split"].grid(row=4, column=0, columnspan=2, sticky="w", pady=(6, 0))
         opts.columnconfigure(1, weight=1)
 
         dest = ttk.LabelFrame(side, text=self.t("save_box"), padding=8)
         self._widgets["save_box"] = dest
         dest.pack(fill=tk.X, pady=(0, 8))
-        ttk.Entry(dest, textvariable=self.outdir, width=28).pack(side=tk.LEFT, fill=tk.X, expand=True)
-        ttk.Button(dest, text="…", width=3, command=self.pick_folder).pack(side=tk.LEFT, padx=(6, 0))
+        ttk.Entry(dest, textvariable=self.outdir, width=28).pack(
+            side=tk.LEFT, fill=tk.X, expand=True
+        )
+        ttk.Button(dest, text="…", width=3, command=self.pick_folder).pack(
+            side=tk.LEFT, padx=(6, 0)
+        )
 
         self.scan_btn = ttk.Button(side, text=self.t("scan_save"), command=self.start_scan)
         self.scan_btn.pack(fill=tk.X, pady=(4, 4), ipady=6)
@@ -252,9 +255,10 @@ class ScannerApp(tk.Tk):
                     mmw=offer.mm_x,
                     mmh=offer.mm_y,
                 )
-                self.after(0, lambda: self._probe_ok(text))
-            except (OSError, ScannerError) as e:
-                self.after(0, lambda: self._fail(self.t("no_scanner", error=e)))
+                self.after(0, lambda t=text: self._probe_ok(t))
+            except Exception as e:
+                msg = self.t("no_scanner", error=e)
+                self.after(0, lambda m=msg: self._fail(m))
 
         threading.Thread(target=work, daemon=True).start()
 
@@ -285,12 +289,11 @@ class ScannerApp(tk.Tk):
                     max_seconds=float(self.cfg.get("max_seconds", 180)),
                 )
                 crops = extract_objects(result.image) if do_split else []
-                paths = save_scan_set(
-                    result.image, crops, folder, stamp=stamp_now(), prefix=prefix
-                )
-                self.after(0, lambda: self._scan_ok(result, crops, paths))
-            except (OSError, ScannerError) as e:
-                self.after(0, lambda: self._fail(self.t("scan_failed", error=e)))
+                paths = save_scan_set(result.image, crops, folder, stamp=stamp_now(), prefix=prefix)
+                self.after(0, lambda r=result, c=crops, p=paths: self._scan_ok(r, c, p))
+            except Exception as e:
+                msg = self.t("scan_failed", error=e)
+                self.after(0, lambda m=msg: self._fail(m))
 
         threading.Thread(target=work, daemon=True).start()
 
@@ -305,9 +308,19 @@ class ScannerApp(tk.Tk):
         self.set_busy(False, self.t("scan_ok", w=w, h=h, extra=extra, names=names))
         self._draw_preview()
 
+    def report_callback_exception(self, exc, val, tb) -> None:  # type: ignore[override]
+        # Keep the window alive if a Tk callback fails (e.g. offline scanner).
+        self._fail(str(val) or exc.__name__)
+
     def _fail(self, msg: str) -> None:
-        self.set_busy(False, msg)
-        messagebox.showerror(self.t("error"), msg)
+        try:
+            self.set_busy(False, msg)
+        except tk.TclError:
+            pass
+        try:
+            messagebox.showerror(self.t("error"), msg)
+        except tk.TclError:
+            pass
 
     def clear_preview(self) -> None:
         self._image = None
