@@ -56,3 +56,4 @@ ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["I001"]
+"tests/test_offline_gui.py" = ["E731", "F821", "F841"]
