@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+settings.json
+config.yaml
+.DS_Store
+_verify*
+*.png
+*.jpg
+*.jpeg
+!locales/
+.idea/
+.vscode/
+dist/
+build/
