@@ -1,0 +1,26 @@
+# Copy to config.yaml (same folder) or rely on ~/.config/j315scan/settings.json
+# GUI settings overwrite these on each save.
+
+# Scanner IP (Brother DCP-J315W or other brscan3-class device)
+host: 192.168.0.80
+port: 54921
+
+# color | gray
+mode: color
+dpi: 200
+brightness: 50
+contrast: 50
+
+# Split photos on the glass into separate files
+split: true
+
+# Default output directory (~/Pictures)
+outdir: ~/Pictures
+filename_prefix: scan
+
+# auto | en | pl | de
+language: auto
+
+jpeg_quality: 92
+idle_timeout: 25
+max_seconds: 180
